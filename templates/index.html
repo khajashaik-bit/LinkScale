@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkSpace</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f6f9;
+        }
+
+        .card {
+            max-width: 650px;
+            margin: auto;
+            border-radius: 12px;
+        }
+
+        .title {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .short-link {
+            font-size: 18px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container mt-5">
+
+    <div class="card p-4 shadow">
+
+        <h2 class="text-center mb-4 title">
+            LinkSpace
+        </h2>
+
+        <form method="POST">
+
+            <!-- Long URL Input -->
+            <input
+                type="text"
+                name="url"
+                class="form-control mb-3"
+                placeholder="Enter Long URL (e.g., google.com)"
+                required
+            >
+
+            <!-- Custom Short URL -->
+            <input
+                type="text"
+                name="custom_code"
+                class="form-control mb-3"
+                placeholder="Custom Short URL (Optional)"
+            >
+
+            <!-- Submit Button -->
+            <button class="btn btn-primary w-100">
+                Shorten URL
+            </button>
+
+        </form>
+
+        <!-- UPGRADE 1: Handles and displays backend error responses inside the page layout -->
+        {% if error_message %}
+        <div class="alert alert-danger mt-4 text-center">
+            <strong>Error:</strong> {{ error_message }}
+        </div>
+        {% endif %}
+
+        <!-- Result -->
+        {% if short_url %}
+        <div class="alert alert-success mt-4 text-center">
+            <strong>
+                {{ message }}
+            </strong>
+            <hr>
+            <div class="short-link d-flex align-items-center justify-content-between bg-white p-2 border rounded">
+                <!-- UPGRADE 2: Added 'url' filter to prevent template escape vulnerabilities -->
+                <a href="{{ short_url | urlencode }}" id="shortUrlText" target="_blank" class="text-decoration-none text-success font-weight-bold">
+                    {{ short_url }}
+                </a>
+                
+                <!-- UPGRADE 3: Instant JavaScript Copy Button -->
+                <button onclick="copyToClipboard()" class="btn btn-sm btn-outline-success ms-2" id="copyBtn">
+                    Copy
+                </button>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Analytics Button -->
+        <a href="/stats" class="btn btn-dark mt-3">
+            View Analytics
+        </a>
+
+    </div>
+
+</div>
+
+<!-- Small JavaScript function to handle text copying -->
+<script>
+function copyToClipboard() {
+    var linkText = document.getElementById("shortUrlText").innerText;
+    navigator.clipboard.writeText(linkText).then(function() {
+        var copyBtn = document.getElementById("copyBtn");
+        copyBtn.innerText = "Copied!";
+        copyBtn.className = "btn btn-sm btn-success ms-2";
+        
+        // Reset the button look after 2 seconds
+        setTimeout(function() {
+            copyBtn.innerText = "Copy";
+            copyBtn.className = "btn btn-sm btn-outline-success ms-2";
+        }, 2000);
+    });
+}
+</script>
+
+</body>
+</html>

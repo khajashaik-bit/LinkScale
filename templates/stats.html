@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Analytics Dashboard</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f4f6f9;
+        }
+
+        .truncate-text {
+            max-width: 400px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .stat-card {
+            border: none;
+            border-radius: 12px;
+        }
+
+        .table-responsive {
+            max-height: 650px;
+        }
+
+        thead th {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container mt-5">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">URL Analytics Dashboard</h2>
+
+        <a href="/" class="btn btn-primary">
+            + Shorten New URL
+        </a>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+
+        <div class="col-md-6 mb-3">
+            <div class="card stat-card shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">Total URLs</h6>
+                    <h3>{{ total_urls }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <div class="card stat-card shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">Total Clicks</h6>
+                    <h3>{{ total_clicks }}</h3>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Table -->
+    <div class="card shadow rounded-3 overflow-hidden">
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Target Destination</th>
+                        <th>Short Link</th>
+                        <th class="text-center">Clicks</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for row in data %}
+                    <tr>
+
+                        <td class="text-muted fw-semibold">
+                            {{ row[0] }}
+                        </td>
+
+                        <td>
+                            <div class="truncate-text">
+                                <a href="{{ row[1] }}"
+                                   target="_blank"
+                                   title="{{ row[1] }}"
+                                   class="text-decoration-none text-dark">
+                                    {{ row[1] }}
+                                </a>
+                            </div>
+                        </td>
+
+                        <td>
+                            <a href="/{{ row[2] }}"
+                               target="_blank"
+                               class="badge bg-primary text-decoration-none fs-6">
+                                /{{ row[2] }}
+                            </a>
+                        </td>
+
+                        <td class="text-center">
+
+                            {% if row[3] == 0 %}
+                                <span class="badge bg-secondary">
+                                    {{ row[3] }}
+                                </span>
+
+                            {% elif row[3] < 10 %}
+                                <span class="badge bg-success">
+                                    {{ row[3] }}
+                                </span>
+
+                            {% else %}
+                                <span class="badge bg-warning text-dark">
+                                    {{ row[3] }}
+                                </span>
+                            {% endif %}
+
+                        </td>
+
+                        <td class="text-center">
+
+                            <form action="/delete/{{ row[0] }}"
+                                  method="POST"
+                                  style="display:inline;">
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-sm btn-outline-danger"
+                                    onclick="return confirm('Delete this URL permanently?');">
+
+                                    Delete
+
+                                </button>
+
+                            </form>
+
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+
+                    {% if not data %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            No URLs have been shortened yet.
+                        </td>
+                    </tr>
+                    {% endif %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
